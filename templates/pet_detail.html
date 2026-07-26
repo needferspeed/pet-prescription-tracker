@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ pet['name'] }}'s Prescriptions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href="/">&larr; Back to all pets</a>
+    <h1>{{ pet['name'] }}</h1>
+    <p>Species: {{ pet['species'] }} | Breed: {{ pet['breed'] }} | Weight: {{ pet['weight_lbs'] }} lbs</p>
+
+    <h2>Prescriptions</h2>
+    <ul>
+    {% for p in prescriptions %}
+        <li>
+            Dosage: {{ p['dosage_amount'] }} every {{ p['frequency_hours'] }} hours
+            | Supply on hand: {{ p['supply_on_hand'] }}
+            | Refill threshold: {{ p['refill_threshold'] }}
+
+            <form action="/dose/{{ p['id'] }}" method="post" style="display:inline">
+                <input type="number" step="any" name="amount" placeholder="amount" required>
+                <button type="submit">Log Dose</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Pets</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href="/">&larr; Back to dashboard</a>
+    <h1>Search Results for "{{ query }}"</h1>
+
+    {% if results %}
+        <ul>
+        {% for pet in results %}
+            <li><a href="/pet/{{ pet['id'] }}">{{ pet['name'] }}</a> (Pet ID: {{ pet['id'] }})</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No pets found matching "{{ query }}".</p>
+    {% endif %}
+</body>
+</html>

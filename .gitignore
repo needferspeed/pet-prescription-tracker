@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pyc
+pet_tracker.db
+static/uploads/*
+.vscode/

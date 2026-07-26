@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add a Pet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href="/">&larr; Back to dashboard</a>
+    <h1>Add a New Pet</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        <h2>Pet Info</h2>
+        <label>Name:</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label>Species:</label><br>
+        <input type="text" name="species"><br><br>
+
+        <label>Breed:</label><br>
+        <input type="text" name="breed"><br><br>
+
+        <label>Weight (lbs):</label><br>
+        <input type="number" step="any" name="weight_lbs"><br><br>
+
+        <label>Age:</label><br>
+        <input type="number" name="age"><br><br>
+
+        <label>Known Medical Issues:</label><br>
+        <textarea name="medical_issues" rows="3" cols="40"></textarea><br><br>
+
+        <label>Veterinarian Name:</label><br>
+        <input type="text" name="vet_name"><br><br>
+
+        <label>Veterinarian Contact (phone or email):</label><br>
+        <input type="text" name="vet_contact"><br><br>
+
+        <label>Photo:</label><br>
+        <input type="file" name="photo" accept="image/*"><br><br>
+
+        <h2>Prescription (optional)</h2>
+        <label>Medication Name:</label><br>
+        <input type="text" name="med_name"><br><br>
+
+        <label>Unit (mg, ml, tablet):</label><br>
+        <input type="text" name="med_unit"><br><br>
+
+        <label>Dosage Amount (per dose):</label><br>
+        <input type="number" step="any" name="dosage_amount"><br><br>
+
+        <label>Frequency (hours between doses):</label><br>
+        <input type="number" name="frequency_hours"><br><br>
+
+        <label>Supply on Hand:</label><br>
+        <input type="number" step="any" name="supply_on_hand"><br><br>
+
+        <label>Refill Alert Threshold:</label><br>
+        <input type="number" step="any" name="refill_threshold"><br><br>
+
+        <label>Start Date:</label><br>
+        <input type="date" name="start_date"><br><br>
+
+        <button type="submit">Save Pet</button>
+    </form>
+</body>
+</html>
