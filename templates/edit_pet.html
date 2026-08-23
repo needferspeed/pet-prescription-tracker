@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit {{ pet.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href="{{ url_for('pet_detail', pet_id=pet.id) }}">&larr; Back to {{ pet.name }}</a>
+    <h1>Edit {{ pet.name }}</h1>
+
+    <form method="post" class="form-card">
+        <h2>Pet Info</h2>
+        <label>Name:</label><br>
+        <input type="text" name="name" value="{{ pet.name }}" required><br><br>
+
+        <label>Species:</label><br>
+        <input type="text" name="species" value="{{ pet.species or '' }}"><br><br>
+
+        <label>Breed:</label><br>
+        <input type="text" name="breed" value="{{ pet.breed or '' }}"><br><br>
+
+        <label>Weight (lbs):</label><br>
+        <input type="number" step="any" name="weight_lbs" value="{{ pet.weight_lbs or '' }}"><br><br>
+
+        <label>Age:</label><br>
+        <input type="number" name="age" value="{{ pet.age or '' }}"><br><br>
+
+        <label>Known Medical Issues:</label><br>
+        <textarea name="medical_issues" rows="3" cols="40">{{ pet.medical_issues or '' }}</textarea><br><br>
+
+        <label>Veterinarian Name:</label><br>
+        <input type="text" name="vet_name" value="{{ pet.vet_name or '' }}"><br><br>
+
+        <label>Veterinarian Contact (phone or email):</label><br>
+        <input type="text" name="vet_contact" value="{{ pet.vet_contact or '' }}"><br><br>
+
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <form method="post" action="{{ url_for('delete_pet_route', pet_id=pet.id) }}"
+          onsubmit="return confirm('Delete {{ pet.name }} and all its prescriptions? This cannot be undone.');">
+        <button type="submit" class="btn-danger">Delete Pet</button>
+    </form>
+</body>
+</html>

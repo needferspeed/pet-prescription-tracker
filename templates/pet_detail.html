@@ -7,21 +7,75 @@
 <body>
     <a href="/">&larr; Back to all pets</a>
     <h1>{{ pet['name'] }}</h1>
+
+    {% if pet['photo_filename'] %}
+        <img class="pet-photo" src="{{ url_for('static', filename='uploads/' + pet['photo_filename']) }}" alt="{{ pet['name'] }}">
+    {% endif %}
+
+    <form action="{{ url_for('upload_photo', pet_id=pet['id']) }}" method="post" enctype="multipart/form-data" class="form-inline">
+        <input type="file" name="photo" accept="image/*" required>
+        <button type="submit" class="btn-secondary">{{ 'Change Photo' if pet['photo_filename'] else 'Upload Photo' }}</button>
+    </form>
+
     <p>Species: {{ pet['species'] }} | Breed: {{ pet['breed'] }} | Weight: {{ pet['weight_lbs'] }} lbs</p>
+    <a href="{{ url_for('edit_pet', pet_id=pet['id']) }}" class="btn">Edit Pet</a>
+
+    <h2>Add a Prescription</h2>
+<form action="{{ url_for('add_prescription_route', pet_id=pet['id']) }}" method="post" class="form-card">
+    <label>Medication Name:</label><br>
+    <input type="text" name="med_name" required><br><br>
+
+    <label>Unit (mg, ml, tablet):</label><br>
+    <input type="text" name="med_unit"><br><br>
+
+    <label>Dosage Amount (per dose):</label><br>
+    <input type="number" step="any" name="dosage_amount"><br><br>
+
+    <label>Frequency (hours between doses):</label><br>
+    <input type="number" name="frequency_hours"><br><br>
+
+    <label>Supply on Hand:</label><br>
+    <input type="number" step="any" name="supply_on_hand"><br><br>
+
+    <label>Refill Alert Threshold:</label><br>
+    <input type="number" step="any" name="refill_threshold"><br><br>
+
+    <label>Start Date:</label><br>
+    <input type="date" name="start_date"><br><br>
+
+    <button type="submit" class="btn-secondary">Add Prescription</button>
+</form>
 
     <h2>Prescriptions</h2>
     <ul>
     {% for p in prescriptions %}
-        <li>
-            Dosage: {{ p['dosage_amount'] }} every {{ p['frequency_hours'] }} hours
-            | Supply on hand: {{ p['supply_on_hand'] }}
-            | Refill threshold: {{ p['refill_threshold'] }}
+        <li class="{{ 'alert-refill' if p['supply_on_hand'] <= p['refill_threshold'] else '' }}">
+    {% if p['supply_on_hand'] <= p['refill_threshold'] %}
+        <span class="badge badge-refill">Refill needed</span>
+    {% endif %}
+    <strong>{{ p['medication_name'] }}</strong>
+    — Dosage: {{ p['dosage_amount'] }} {{ p['medication_unit'] }} every {{ p['frequency_hours'] }} hours
+    | Supply on hand: {{ p['supply_on_hand'] }} {{ p['medication_unit'] }}
+    | Refill threshold: {{ p['refill_threshold'] }} {{ p['medication_unit'] }}
 
-            <form action="/dose/{{ p['id'] }}" method="post" style="display:inline">
-                <input type="number" step="any" name="amount" placeholder="amount" required>
-                <button type="submit">Log Dose</button>
-            </form>
-        </li>
+    <div class="rx-actions">
+        <form action="/dose/{{ p['id'] }}" method="post" class="rx-action-form">
+            <label for="amount-{{ p['id'] }}">Amount given</label>
+            <div class="field-row">
+                <input type="number" step="any" id="amount-{{ p['id'] }}" name="amount" placeholder="e.g. 1" required>
+                <button type="submit" class="btn-secondary">Log Dose</button>
+            </div>
+        </form>
+
+        <form action="/refill/{{ p['id'] }}" method="post" class="rx-action-form">
+            <label for="new_amount-{{ p['id'] }}">New supply amount</label>
+            <div class="field-row">
+                <input type="number" step="any" id="new_amount-{{ p['id'] }}" name="new_amount" placeholder="e.g. 30" required>
+                <button type="submit" class="btn-secondary">Mark Refilled</button>
+            </div>
+        </form>
+    </div>
+</li>
     {% endfor %}
     </ul>
 </body>

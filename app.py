@@ -5,6 +5,7 @@ from database import init_db, get_connection
 from models import (
     create_owner, get_owner, authenticate_owner, email_exists,
     add_pet, get_pets_for_owner, get_pet, search_pets, update_pet_photo,
+    update_pet, delete_pet, resolve_alert,
     add_medication, add_prescription, get_prescriptions_for_pet,
     get_prescription, refill_prescription, log_dose
 )
@@ -69,10 +70,11 @@ def index():
     conn = get_connection()
     alerts = conn.execute("""
         SELECT alerts.*, pets.name as pet_name, pets.vet_name as vet_name,
-               pets.vet_contact as vet_contact
+               pets.vet_contact as vet_contact, medications.name as medication_name
         FROM alerts
         JOIN prescriptions ON alerts.prescription_id = prescriptions.id
         JOIN pets ON prescriptions.pet_id = pets.id
+        JOIN medications ON prescriptions.medication_id = medications.id
         WHERE alerts.resolved = 0 AND pets.owner_id = ?
     """, (owner_id,)).fetchall()
     conn.close()
@@ -151,6 +153,45 @@ def upload_photo(pet_id):
         update_pet_photo(pet_id, photo_filename)
     return redirect(url_for("pet_detail", pet_id=pet_id))
 
+@app.route("/pet/<int:pet_id>/edit", methods=["GET", "POST"])
+def edit_pet(pet_id):
+    owner_id = session.get("owner_id")
+    if not owner_id:
+        return redirect(url_for("login"))
+
+    pet = get_pet(pet_id)
+    if not pet or pet["owner_id"] != owner_id:
+        return redirect(url_for("index"))
+
+    if request.method == "POST":
+        name = request.form["name"]
+        species = request.form["species"]
+        breed = request.form["breed"]
+        weight_lbs = request.form["weight_lbs"]
+        age = request.form["age"]
+        medical_issues = request.form["medical_issues"]
+        vet_name = request.form.get("vet_name")
+        vet_contact = request.form.get("vet_contact")
+
+        update_pet(pet_id, name, species, breed, weight_lbs, age,
+                   medical_issues, vet_name, vet_contact)
+        return redirect(url_for("pet_detail", pet_id=pet_id))
+
+    return render_template("edit_pet.html", pet=pet)
+
+@app.route("/pet/<int:pet_id>/delete", methods=["POST"])
+def delete_pet_route(pet_id):
+    owner_id = session.get("owner_id")
+    if not owner_id:
+        return redirect(url_for("login"))
+
+    pet = get_pet(pet_id)
+    if not pet or pet["owner_id"] != owner_id:
+        return redirect(url_for("index"))
+
+    delete_pet(pet_id)
+    return redirect(url_for("index"))
+
 # ---------- Dosage & refill ----------
 
 @app.route("/dose/<int:prescription_id>", methods=["POST"])
@@ -172,5 +213,52 @@ def refill(prescription_id):
     conn.close()
     return redirect(request.referrer)
 
+# ---------- Prescriptions & Alerts ----------
+
+@app.route("/pet/<int:pet_id>/add_prescription", methods=["POST"])
+def add_prescription_route(pet_id):
+    owner_id = session.get("owner_id")
+    if not owner_id:
+        return redirect(url_for("login"))
+
+    pet = get_pet(pet_id)
+    if not pet or pet["owner_id"] != owner_id:
+        return redirect(url_for("index"))
+
+    med_name = request.form["med_name"]
+    med_unit = request.form.get("med_unit", "unit")
+    dosage_amount = request.form.get("dosage_amount", 0)
+    frequency_hours = request.form.get("frequency_hours", 24)
+    supply_on_hand = request.form.get("supply_on_hand", 0)
+    refill_threshold = request.form.get("refill_threshold", 0)
+    start_date = request.form.get("start_date", "")
+
+    medication_id = add_medication(med_name, med_unit)
+    add_prescription(pet_id, medication_id, dosage_amount, frequency_hours,
+                      supply_on_hand, refill_threshold, start_date)
+
+    return redirect(url_for("pet_detail", pet_id=pet_id))
+
+@app.route("/alert/<int:alert_id>/dismiss", methods=["POST"])
+def dismiss_alert(alert_id):
+    owner_id = session.get("owner_id")
+    if not owner_id:
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    alert = conn.execute("""
+        SELECT alerts.id
+        FROM alerts
+        JOIN prescriptions ON alerts.prescription_id = prescriptions.id
+        JOIN pets ON prescriptions.pet_id = pets.id
+        WHERE alerts.id = ? AND pets.owner_id = ?
+    """, (alert_id, owner_id)).fetchone()
+    conn.close()
+
+    if alert:
+        resolve_alert(alert_id)
+    return redirect(url_for("index"))
+
 if __name__ == "__main__":
     app.run(debug=True)
+

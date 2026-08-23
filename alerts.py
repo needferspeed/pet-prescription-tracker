@@ -11,18 +11,26 @@ def _has_unresolved_alert(conn, prescription_id, alert_type):
 
 def check_refill_warnings():
     conn = get_connection()
-    prescriptions = conn.execute("SELECT * FROM prescriptions").fetchall()
+    prescriptions = conn.execute("""
+        SELECT prescriptions.*, medications.name AS medication_name
+        FROM prescriptions
+        JOIN medications ON prescriptions.medication_id = medications.id
+    """).fetchall()
     for p in prescriptions:
         if p["supply_on_hand"] <= p["refill_threshold"]:
             if not _has_unresolved_alert(conn, p["id"], "refill_warning"):
                 _create_alert(conn, p["id"], "refill_warning",
-                              f"Refill needed: supply at {p['supply_on_hand']}")
+                              f"{p['medication_name']} refill needed: supply at {p['supply_on_hand']}")
     conn.commit()
     conn.close()
 
 def check_dispense_reminders():
     conn = get_connection()
-    prescriptions = conn.execute("SELECT * FROM prescriptions").fetchall()
+    prescriptions = conn.execute("""
+        SELECT prescriptions.*, medications.name AS medication_name
+        FROM prescriptions
+        JOIN medications ON prescriptions.medication_id = medications.id
+    """).fetchall()
     for p in prescriptions:
         last_dose = conn.execute(
             "SELECT MAX(given_at) as last FROM dosage_logs WHERE prescription_id = ?",
@@ -33,7 +41,8 @@ def check_dispense_reminders():
             due_time = last_time + timedelta(hours=p["frequency_hours"])
             if datetime.now() >= due_time:
                 if not _has_unresolved_alert(conn, p["id"], "dispense_reminder"):
-                    _create_alert(conn, p["id"], "dispense_reminder", "Dose is due")
+                    _create_alert(conn, p["id"], "dispense_reminder",
+                                  f"{p['medication_name']} dose is due")
     conn.commit()
     conn.close()
 

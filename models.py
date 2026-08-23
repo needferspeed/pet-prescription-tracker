@@ -88,6 +88,41 @@ def update_pet_photo(pet_id, photo_filename):
     conn.commit()
     conn.close()
 
+def update_pet(pet_id, name, species, breed, weight_lbs, age, medical_issues,
+                vet_name=None, vet_contact=None):
+    conn = get_connection()
+    conn.execute(
+        """UPDATE pets
+           SET name = ?, species = ?, breed = ?, weight_lbs = ?, age = ?,
+               medical_issues = ?, vet_name = ?, vet_contact = ?
+           WHERE id = ?""",
+        (name, species, breed, weight_lbs, age, medical_issues,
+         vet_name, vet_contact, pet_id)
+    )
+    conn.commit()
+    conn.close()
+
+def delete_pet(pet_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    # Prescriptions reference pets via FK, and dosage_logs/alerts reference
+    # prescriptions, so children must go first or the FK constraint will block this.
+    prescription_ids = [
+        row["id"] for row in
+        cur.execute("SELECT id FROM prescriptions WHERE pet_id = ?", (pet_id,)).fetchall()
+    ]
+    for pid in prescription_ids:
+        cur.execute(
+            "DELETE FROM alerts WHERE prescription_id = ?", (pid,)
+        )
+        cur.execute(
+            "DELETE FROM dosage_logs WHERE prescription_id = ?", (pid,)
+        )
+    cur.execute("DELETE FROM prescriptions WHERE pet_id = ?", (pet_id,))
+    cur.execute("DELETE FROM pets WHERE id = ?", (pet_id,))
+    conn.commit()
+    conn.close()
+
 # ---------- Medications ----------
 
 def add_medication(name, unit):
@@ -119,9 +154,12 @@ def add_prescription(pet_id, medication_id, dosage_amount, frequency_hours,
 
 def get_prescriptions_for_pet(pet_id):
     conn = get_connection()
-    rows = conn.execute(
-        "SELECT * FROM prescriptions WHERE pet_id = ?", (pet_id,)
-    ).fetchall()
+    rows = conn.execute("""
+        SELECT prescriptions.*, medications.name AS medication_name, medications.unit AS medication_unit
+        FROM prescriptions
+        JOIN medications ON prescriptions.medication_id = medications.id
+        WHERE prescriptions.pet_id = ?
+    """, (pet_id,)).fetchall()
     conn.close()
     return rows
 
@@ -156,5 +194,11 @@ def log_dose(prescription_id, amount_given):
         "UPDATE prescriptions SET supply_on_hand = supply_on_hand - ? WHERE id = ?",
         (amount_given, prescription_id)
     )
+    conn.commit()
+    conn.close()
+
+def resolve_alert(alert_id):
+    conn = get_connection()
+    conn.execute("UPDATE alerts SET resolved = 1 WHERE id = ?", (alert_id,))
     conn.commit()
     conn.close()

@@ -1,30 +1,102 @@
+/* ============================================================
+   PetScript Manager — Stylesheet
+   Palette: warm, caretaking, colorful — not clinical.
+   Coral = primary/CTA · Marigold = refill/warning · Teal = dispense/success · Sky = links/info
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+    --bg: #FBF7FF;
+    --surface: #FFFFFF;
+    --ink: #2B2438;
+    --ink-soft: #6B6280;
+
+    --coral: #FF6B6B;
+    --coral-dark: #E44F4F;
+    --marigold: #FFB84C;
+    --marigold-dark: #E89A2C;
+    --teal: #2EC4B6;
+    --teal-dark: #21A79B;
+    --sky: #5B8DEF;
+    --danger: #E5484D;
+    --danger-dark: #C93A3E;
+
+    --border: #E9E2F5;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 14px rgba(43, 36, 56, 0.08);
+    --shadow-hover: 0 8px 22px rgba(43, 36, 56, 0.14);
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    max-width: 700px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    max-width: 760px;
     margin: 40px auto;
-    padding: 0 20px;
-    background-color: #f7f7f7;
-    color: #222;
+    padding: 0 24px 60px;
+    background-color: var(--bg);
+    color: var(--ink);
+}
+
+/* ---------- Typography ---------- */
+
+h1, h2, h3 {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
 }
 
 h1 {
-    color: #2c5f2d;
+    font-size: 2.1rem;
+    margin: 8px 0 20px;
+    display: inline-block;
+    background: linear-gradient(90deg, var(--coral), var(--marigold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 h2 {
-    color: #444;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 5px;
+    font-size: 1.3rem;
+    color: var(--ink);
+    border-bottom: 3px solid var(--marigold);
+    display: inline-block;
+    padding-bottom: 4px;
+    margin: 28px 0 16px;
 }
 
+p {
+    color: var(--ink-soft);
+}
+
+/* ---------- Links ---------- */
+
 a {
-    color: #2c5f2d;
+    color: var(--sky);
     text-decoration: none;
+    font-weight: 700;
 }
 
 a:hover {
     text-decoration: underline;
 }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid var(--sky);
+    outline-offset: 2px;
+}
+
+/* ---------- Lists / Cards (pets, prescriptions, alerts) ---------- */
 
 ul {
     list-style: none;
@@ -32,29 +104,219 @@ ul {
 }
 
 li {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin-bottom: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--coral);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-button {
-    background-color: #2c5f2d;
+li:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+/* Optional accent variants — add these classes to <li> where relevant
+   e.g. <li class="alert-refill"> for a refill warning,
+        <li class="alert-dispense"> for a dose-due reminder */
+li.alert-refill {
+    border-left-color: var(--marigold);
+    background: #FFF9EF;
+}
+
+li.alert-dispense {
+    border-left-color: var(--teal);
+    background: #EEFBF9;
+}
+
+/* ---------- Buttons ---------- */
+
+button, .btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    background-color: var(--coral);
     color: white;
     border: none;
-    padding: 6px 14px;
-    border-radius: 4px;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
-button:hover {
-    background-color: #234a24;
+button:hover, .btn:hover {
+    background-color: var(--coral-dark);
+    transform: translateY(-1px);
+}
+
+button:active, .btn:active {
+    transform: translateY(0);
+}
+
+/* Use for destructive actions, e.g. <button class="btn-danger">Delete Pet</button> */
+button.btn-danger, .btn-danger {
+    background-color: var(--danger);
+}
+
+button.btn-danger:hover, .btn-danger:hover {
+    background-color: var(--danger-dark);
+}
+
+/* Use for secondary/calmer actions, e.g. "Log Dose" or "Cancel" */
+button.btn-secondary, .btn-secondary {
+    background-color: var(--teal);
+}
+
+button.btn-secondary:hover, .btn-secondary:hover {
+    background-color: var(--teal-dark);
+}
+
+/* ---------- Forms ---------- */
+
+/* ---------- Forms ---------- */
+
+.form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+.form-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-inline input[type="number"] {
+    width: 100px;
+    margin: 0;
+}
+
+label {
+    display: block;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    width: 100%;
+    max-width: 320px;
+    padding: 9px 12px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--ink);
+    transition: border-color 0.15s ease;
 }
 
 input[type="number"] {
-    padding: 5px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 100px;
+    width: 140px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--coral);
+    outline: none;
+}
+
+input[type="file"] {
+    font-family: 'Nunito', sans-serif;
+    padding: 6px 0;
+}
+
+textarea {
+    max-width: 100%;
+    resize: vertical;
+}
+
+/* ---------- Badges (medication status, alert type, etc.) ---------- */
+/* Optional: <span class="badge badge-refill">Refill needed</span> */
+
+.badge {
+    display: inline-block;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    color: white;
+}
+
+.badge-refill {
+    background-color: var(--marigold);
+    color: #4A3400;
+}
+
+.badge-dispense {
+    background-color: var(--teal);
+}
+
+.badge-danger {
+    background-color: var(--danger);
+}
+
+.pet-photo {
+    display: block;
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 3px solid var(--coral);
+    margin: 12px 0;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 480px) {
+    body {
+        margin: 20px auto;
+        padding: 0 16px 40px;
+    }
+
+    h1 {
+        font-size: 1.7rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    textarea,
+    select {
+        max-width: 100%;
+    }
+
+    form {
+        padding: 18px;
+    }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    li, button, .btn {
+        transition: none;
+    }
+
+    li:hover {
+        transform: none;
+    }
 }

@@ -8,7 +8,7 @@
     <a href="/">&larr; Back to dashboard</a>
     <h1>Add a New Pet</h1>
 
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="form-card">
         <h2>Pet Info</h2>
         <label>Name:</label><br>
         <input type="text" name="name" required><br><br>
@@ -42,7 +42,14 @@
         <input type="text" name="med_name"><br><br>
 
         <label>Unit (mg, ml, tablet):</label><br>
-        <input type="text" name="med_unit"><br><br>
+        <select name="med_unit">
+            <option value="">-- select unit --</option>
+            <option value="mg">mg</option>
+            <option value="ml">ml</option>
+            <option value="tablet">tablet</option>
+            <option value="capsule">capsule</option>
+            <option value="drop">drop</option>
+        </select><br><br>
 
         <label>Dosage Amount (per dose):</label><br>
         <input type="number" step="any" name="dosage_amount"><br><br>
