@@ -18,6 +18,9 @@
         {% endif %}
 
         <form method="post">
+            <!-- csrf_token() is a Jinja global registered in app.py; it must be
+                 present on every POST form or the request is rejected with 400. -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <label for="owner_name">Your Name:</label><br>
             <input type="text" id="owner_name" name="owner_name" required><br><br>
 

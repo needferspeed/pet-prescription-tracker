@@ -12,7 +12,12 @@
         <img class="pet-photo" src="{{ url_for('static', filename='uploads/' + pet['photo_filename']) }}" alt="{{ pet['name'] }}">
     {% endif %}
 
+    {% if error %}
+        <p class="badge badge-danger" style="display:block; padding:10px 14px; margin-bottom:16px;">{{ error }}</p>
+    {% endif %}
+
     <form action="{{ url_for('upload_photo', pet_id=pet['id']) }}" method="post" enctype="multipart/form-data" class="form-inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="file" name="photo" accept="image/*" required>
         <button type="submit" class="btn-secondary">{{ 'Change Photo' if pet['photo_filename'] else 'Upload Photo' }}</button>
     </form>
@@ -22,6 +27,7 @@
 
     <h2>Add a Prescription</h2>
 <form action="{{ url_for('add_prescription_route', pet_id=pet['id']) }}" method="post" class="form-card">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label>Medication Name:</label><br>
     <input type="text" name="med_name" required><br><br>
 
@@ -60,6 +66,7 @@
 
     <div class="rx-actions">
         <form action="/dose/{{ p['id'] }}" method="post" class="rx-action-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <label for="amount-{{ p['id'] }}">Amount given</label>
             <div class="field-row">
                 <input type="number" step="any" id="amount-{{ p['id'] }}" name="amount" placeholder="e.g. 1" required>
@@ -68,6 +75,7 @@
         </form>
 
         <form action="/refill/{{ p['id'] }}" method="post" class="rx-action-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <label for="new_amount-{{ p['id'] }}">New supply amount</label>
             <div class="field-row">
                 <input type="number" step="any" id="new_amount-{{ p['id'] }}" name="new_amount" placeholder="e.g. 30" required>
